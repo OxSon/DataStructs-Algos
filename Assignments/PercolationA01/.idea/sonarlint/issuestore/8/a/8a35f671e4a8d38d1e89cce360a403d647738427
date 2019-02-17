@@ -1,0 +1,5 @@
+
+«%squid:RedundantThrowsDeclarationCheckV"nRemove the declaration of thrown exception 'java.lang.IndexOutOfBoundsException' which is a runtime exception.(Å¢âùÿÿÿÿ8¶öÖÇŒ-
+¥%squid:RedundantThrowsDeclarationCheck"mRemove the declaration of thrown exception 'java.lang.IllegalArgumentException' which is a runtime exception.(êÿ™ü8¶öÖÇŒ-
+¦%squid:RedundantThrowsDeclarationCheck<"nRemove the declaration of thrown exception 'java.lang.IndexOutOfBoundsException' which is a runtime exception.(¶¦¥8¶öÖÇŒ-
+¦%squid:RedundantThrowsDeclarationChecke"nRemove the declaration of thrown exception 'java.lang.IndexOutOfBoundsException' which is a runtime exception.(…“ÌÅ8¶öÖÇŒ-
