@@ -9,19 +9,19 @@ import java.util.Arrays;
  * @author Chau Pham
  */
 public class Board {
-    /*PERFORMARNCE REQS:
+    /*PERFORMANCE REQS:
      * all methods take time proportional to N^2 or better,
-     * with the exception of isSolveable() which may take up to N^4 in the worst case
+     * with the exception of isSolvable() which may take up to N^4 in the worst case
      */
-    private int[] boardFlat;
-    private int size;
+    private final int[] boardFlat;
+    private final int size;
     //FIXME is it better to compute this on demand,
     // or compute once in constructor and use the extra memory for storing the array?
     // note: storing this array costs us an 4N + 32 byes of memory
     // storing the array also greatly simplifies code in a number of places and improves readability
     // my current thinking is it's worth it to store, but that may change during implementation of solver
     // as we may need to store a large number of board objects
-    private int[] goal;
+    private final int[] goal;
 
     /**
      * Construct a board from an N-by-N array of blocks
@@ -114,7 +114,7 @@ public class Board {
      *
      * @return true if board is solvable false otherwise
      */
-    public boolean isSolveable() {
+    public boolean isSolvable() {
         //TODO
         return false;
     }
