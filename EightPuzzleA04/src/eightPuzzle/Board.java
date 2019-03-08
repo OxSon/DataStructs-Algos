@@ -1,5 +1,7 @@
 package eightPuzzle;
 
+import java.util.Arrays;
+
 /**
  * Represents an 8-Puzzle board
  *
@@ -7,8 +9,19 @@ package eightPuzzle;
  * @author Chau Pham
  */
 public class Board {
+    /*PERFORMARNCE REQS:
+     * all methods take time proportional to N^2 or better,
+     * with the exception of isSolveable() which may take up to N^4 in the worst case
+     */
     private int[] boardFlat;
     private int size;
+    //FIXME is it better to compute this on demand,
+    // or compute once in constructor and use the extra memory for storing the array?
+    // note: storing this array costs us an 4N + 32 byes of memory
+    // storing the array also greatly simplifies code in a number of places and improves readability
+    // my current thinking is it's worth it to store, but that may change during implementation of solver
+    // as we may need to store a large number of board objects
+    private int[] goal;
 
     /**
      * Construct a board from an N-by-N array of blocks
@@ -18,12 +31,16 @@ public class Board {
      * @param blocks initial layout of blocks
      */
     public Board(int[][] blocks) {
-        /*PERFORMARNCE REQS:
-         * all methods take time proportional to N^2 or better,
-         * with the exception of isSolveable() which may take up to N^4 in the worst case
-         */
-        //TODO
+        //TODO decide whether we're calculating goal here. Without, constructor takes O(N) time
+        // with it, still takes O(N) time (~2N using tilde notation)
         size = blocks.length;
+
+        //calculate goal board for later reference
+        goal = new int[size * size];
+        for (int i = 0; i < goal.length - 1; i++) { //add numbers in range [1, size * size - 1]
+            goal[i] = i + 1;
+        }
+        goal[goal.length - 1] = 0; //add the blank square in bottom right
 
         //transfer data to our internal representation
         boardFlat = new int[size * size];
@@ -41,8 +58,7 @@ public class Board {
      * @return board size N
      */
     public int size() {
-        //TODO
-        return 0;
+        return size;
     }
 
     /**
@@ -51,8 +67,14 @@ public class Board {
      * @return the number of blocks out of place
      */
     public int hamming() {
-        //TODO
-        return 0;
+        int count = 0;
+        //we use boardFlat.length - 1 because we are not interested in the position of the blank space
+        for (int i = 0; i < boardFlat.length - 1; i++) {
+            if (goal[i] != boardFlat[i])
+                count++;
+        }
+
+        return count;
     }
 
     /**
@@ -73,8 +95,18 @@ public class Board {
      * @return true if this board is the goal board false otherwise
      */
     public boolean isGoal() {
-        //TODO
-        return false;
+        //FIXME is it better to do the work of calculating this more frequently with this equals method,
+        // or is it better to store the goal board as a field?
+        // With this implementation order of growth is linear, which does meets the minimum requirements
+
+//        //create our goal board
+//        int[] goal = new int[size * size];
+//        for(int i = 0; i < goal.length - 1; i++) { //add numbers in range [1, size * size - 1]
+//            goal[i] = i + 1;
+//        }
+//        goal[goal.length - 1] = 0; //add the blank square in bottom right
+
+        return Arrays.equals(boardFlat, goal);
     }
 
     /**
@@ -89,8 +121,13 @@ public class Board {
 
     @Override
     public boolean equals(Object obj) {
-        //TODO
-        return super.equals(obj);
+        if (this == obj)
+            return true;
+        if (!(obj instanceof Board))//covers case where argument is null or not a board
+            return false;
+
+        //take advantage of private fields and built in int[] comparison equals in java.util.Arrays
+        return Arrays.equals(boardFlat, ((Board) obj).boardFlat);
     }
 
     public Iterable<Board> neighbors() {
@@ -98,6 +135,7 @@ public class Board {
         return null;
     }
 
+    @Override
     public String toString() {
         return String.format("%d\n%s", size, boardString());
     }

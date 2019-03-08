@@ -12,11 +12,6 @@ class BoardTest {
     }
 
     @Test
-    void sizeTest() {
-        fail();
-    }
-
-    @Test
     void hammingTest() {
         fail();
     }
@@ -28,8 +23,21 @@ class BoardTest {
 
     @Test
     void isGoalTest() {
-        fail();
-        fail();
+        //TODO are there more comparison cases that should be tested?
+        // seems fairly simple but am i missing something?
+        Board goal = new Board(new int[][]{
+                {1, 2, 3},
+                {4, 5, 6},
+                {7, 8, 0}
+        });
+        Board notGoal = new Board(new int[][]{
+                {1, 0, 3},
+                {6, 8, 4},
+                {2, 5, 7}
+        });
+
+        assertTrue(goal.isGoal());
+        assertFalse(notGoal.isGoal());
     }
 
     @Test
@@ -39,7 +47,27 @@ class BoardTest {
 
     @Test
     void equalsTest() {
-        fail();
+        //TODO are there more comparison cases that should be tested?
+        // seems fairly simple but am i missing something?
+        Board goal = new Board(new int[][]{
+                {1, 2, 3},
+                {4, 5, 6},
+                {7, 8, 0}
+        });
+        Board notGoal = new Board(new int[][]{
+                {1, 0, 3},
+                {4, 8, 6},
+                {7, 5, 2}
+        });
+        Board alsoGoal = new Board(new int[][]{
+                {1, 2, 3},
+                {4, 5, 6},
+                {7, 8, 0}
+        });
+
+        assertEquals(goal, alsoGoal);
+        assertNotEquals(goal, notGoal);
+        assertNotEquals(alsoGoal, notGoal);
     }
 
     @Test
