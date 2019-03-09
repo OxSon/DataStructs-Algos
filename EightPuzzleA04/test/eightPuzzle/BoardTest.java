@@ -1,24 +1,40 @@
 package eightPuzzle;
 
-import org.junit.jupiter.api.BeforeEach;
+import edu.princeton.cs.algs4.Queue;
 import org.junit.jupiter.api.Test;
+
+import java.util.function.Supplier;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class BoardTest {
-
-    @BeforeEach
-    void setUp() {
-    }
-
     @Test
     void hammingTest() {
-        fail();
+        var board = new Board(new int[][]{
+                {8, 1, 3},
+                {4, 0, 2},
+                {7, 6, 5}
+        });
+        //TODO test this more thoroughly
+        assertEquals(board.hamming(), 5);
+
+        board = new Board(new int[][]{
+                {1, 2, 3},
+                {4, 5, 6},
+                {7, 8, 0}
+        });
+        assertEquals(board.hamming(), 0);
     }
 
     @Test
     void manhattanTest() {
-        fail();
+        //TODO test this more thoroughly
+        var board = new Board(new int[][]{
+                {8, 1, 3},
+                {4, 0, 2},
+                {7, 6, 5}
+        });
+        assertEquals(board.manhattan(), 10);
     }
 
     @Test
@@ -41,8 +57,44 @@ class BoardTest {
     }
 
     @Test
-    void isSolveableTest() {
-        fail();
+    void isSolvableTest() {
+        var board = new Board(new int[][]{
+                {1, 2, 3, 4},
+                {5, 0, 6, 8},
+                {9, 10, 7, 11},
+                {13, 14, 15, 12},
+        });
+        assertTrue(board.isSolvable());
+
+        board = new Board(new int[][]{
+                {1, 2, 3, 4},
+                {5, 0, 6, 8},
+                {9, 10, 7, 11},
+                {13, 14, 12, 15},
+        });
+        assertFalse(board.isSolvable());
+
+        board = new Board(new int[][] {
+                {1, 2, 3},
+                {4, 5, 6},
+                {8, 7, 0}
+        });
+        assertFalse(board.isSolvable());
+
+        board = new Board(new int[][]{
+                {1, 2, 3},
+                {4, 5, 6},
+                {7, 8, 0}
+        });
+        assertTrue(board.isSolvable());
+
+        board = new Board(new int[][]{
+                {1, 2, 3, 4},
+                {5, 6, 7, 8},
+                {9, 10, 11, 12},
+                {13, 15, 14, 0},
+        });
+        assertFalse(board.isSolvable());
     }
 
     @Test
@@ -71,8 +123,232 @@ class BoardTest {
     }
 
     @Test
-    void neighborsTest() {
+    void neightorsTestAll() {
+        //fIXME note all tests are with size = 3 except middle,
+        //and are with similar permutations of board
+//        var neighborsTests = new Supplier<Void>[] {
+//
+//        };
+    }
+
+    @Test
+    void neighborsTestRightEdgeNoCorner() {
+        var board = new Board(new int[][]{
+                {8, 1, 3},
+                {4, 2, 0},
+                {7, 6, 5},
+        });
+
+        var expectedNeighbors = new Board[]{
+                new Board(new int[][]{
+                        {8, 1, 3},
+                        {4, 0, 2},
+                        {7, 6, 5},
+                }),
+                new Board(new int[][]{
+                        {8, 1, 0},
+                        {4, 2, 3},
+                        {7, 6, 5},
+                }),
+                new Board(new int[][]{
+                        {8, 1, 3},
+                        {4, 2, 5},
+                        {7, 6, 0},
+                }),
+        };
+
+        Iterable<Board> result = board.neighbors();
+        for(var neighbor : result) {
+            assertTrue( neighbor.equals(expectedNeighbors[0]) ||
+                        neighbor.equals(expectedNeighbors[1]) ||
+                    neighbor.equals(expectedNeighbors[2])
+            );
+        }
+    }
+
+    @Test
+    void neighborsTestRightEdgeTopCorner() {
+        var board = new Board(new int[][]{
+                {8, 1, 0},
+                {4, 2, 3},
+                {7, 6, 5},
+        });
+
+        var expectedNeighbors = new Board[] {
+                new Board(new int[][]{
+                        {8, 1, 3},
+                        {4, 2, 0},
+                        {7, 6, 5}
+                }),
+                new Board(new int[][]{
+                        {8, 0, 1},
+                        {4, 2, 3},
+                        {7, 6, 5}
+                })
+        };
+
+        Iterable<Board> result = board.neighbors();
+        for(var neighbor : result) {
+            assertTrue( neighbor.equals(expectedNeighbors[0]) ||
+                    neighbor.equals(expectedNeighbors[1])
+            );
+        }
+    }
+
+    @Test
+    void neighborsTestRightEdgeBotCorner() {
+        var board = new Board(new int[][]{
+                {8, 1, 3},
+                {4, 2, 5},
+                {7, 6, 0},
+        });
+
         fail();
+    }
+
+    @Test
+    void neighborsTestTopEdgeNoCorner() {
+        var board = new Board(new int[][]{
+                {8, 0, 3},
+                {4, 2, 1},
+                {7, 6, 5},
+        });
+
+        fail();
+    }
+
+    @Test
+    void neighborsTestTopEdgeRightCorner() {
+        var board = new Board(new int[][]{
+                {8, 3, 0},
+                {4, 2, 1},
+                {7, 6, 5},
+        });
+
+        fail();
+    }
+
+    @Test
+    void neighborsTestTopEdgeLeftCorner() {
+        var board = new Board(new int[][]{
+                {0, 8, 3},
+                {4, 2, 1},
+                {7, 6, 5},
+        });
+
+        fail();
+    }
+
+    @Test
+    void neighborsTestLeftEdgeNoCorner() {
+        var board = new Board(new int[][]{
+                {8, 4, 3},
+                {0, 2, 1},
+                {7, 6, 5},
+        });
+
+        fail();
+    }
+
+    @Test
+    void neighborsTestLeftEdgeTopCorner() {
+        var board = new Board(new int[][]{
+                {0, 8, 3},
+                {4, 2, 1},
+                {7, 6, 5},
+        });
+
+        fail();
+    }
+
+    @Test
+    void neighborsTestLeftEdgeBotCorner() {
+        var board = new Board(new int[][]{
+                {8, 7, 3},
+                {4, 2, 1},
+                {0, 6, 5},
+        });
+
+        fail();
+    }
+
+    @Test
+    void neighborsTestBotEdgeNoCorner() {
+        var board = new Board(new int[][]{
+                {8, 6, 3},
+                {4, 2, 1},
+                {7, 0, 5},
+        });
+
+        fail();
+    }
+
+    @Test
+    void neighborsTestBotEdgeRightCorner() {
+        var board = new Board(new int[][]{
+                {8, 5, 3},
+                {4, 2, 1},
+                {7, 6, 0},
+        });
+
+        fail();
+    }
+
+    @Test
+    void neighborsTestBotEdgeLeftCorner() {
+        var board = new Board(new int[][]{
+                {8, 7, 3},
+                {4, 2, 1},
+                {0, 6, 5},
+        });
+
+        fail();
+    }
+
+    @Test
+    void neighborsTestMiddle() {
+        var board = new Board(new int[][]{
+                {1, 2, 3, 4},
+                {5, 6, 7, 8},
+                {9, 0, 10, 11},
+                {12, 13, 14, 15},
+        });
+
+        var expectedNeighbors = new Board[] {
+                new Board(new int[][] {
+                        {1, 2, 3, 4},
+                        {5, 0, 7, 8},
+                        {9, 6, 10, 11},
+                        {12, 13, 14, 15},
+                }),
+                new Board(new int[][] {
+                        {1, 2, 3, 4},
+                        {5, 6, 7, 8},
+                        {9, 10, 0, 11},
+                        {12, 13, 14, 15},
+                }),
+                new Board(new int[][] {
+                        {1, 2, 3, 4},
+                        {5, 6, 7, 8},
+                        {9, 13, 10, 11},
+                        {12, 0, 14, 15},
+                }),
+                new Board(new int[][] {
+                        {1, 2, 3, 4},
+                        {5, 6, 7, 8},
+                        {0, 9, 10, 11},
+                        {12, 13, 14, 15},
+                })
+        };
+
+        Iterable<Board> result = board.neighbors();
+        for(var neighbor : result) {
+            assertTrue( neighbor.equals(expectedNeighbors[0]) ||
+                    neighbor.equals(expectedNeighbors[1]) ||
+                    neighbor.equals(expectedNeighbors[2]) ||
+                    neighbor.equals(expectedNeighbors[3])
+            );
+        }
     }
 
     @Test
@@ -85,7 +361,7 @@ class BoardTest {
         });
 
         String expected =
-                "3\n 0 1 2\n 3 4 5\n 6 7 8\n";
+                "3\n 0  1  2 \n 3  4  5 \n 6  7  8 \n";
         assertEquals(expected, test.toString());
     }
 }
