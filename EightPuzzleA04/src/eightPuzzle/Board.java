@@ -5,8 +5,11 @@ import java.util.Arrays;
 import edu.princeton.cs.algs4.Queue;
 
 /**
- * Represents an 8-Puzzle board
+ * Represents an 8-Puzzle board.
  *
+ * //FIXME remove fixme comment once we can verify the below is accurate, and perhaps get more detailed
+ * //FIXME  if many methods end up with better than N^2 performance:
+ * All methods take time proportional to N^2 or better, where N is the length of one side of the board.
  * @author Alec Mills
  * @author Chau Pham
  */
@@ -36,8 +39,7 @@ public class Board {
      * (where blocks[i][j] = block in row i, column j).
      * Valid integers are between 0 and (N^2) - 1, where zero represents the empty space
      * <p>
-     * FIXME add time complexity to javadoc
-     *
+     * Takes time proportional to N^2.
      * @param blocks initial layout of blocks.
      */
     public Board(int[][] blocks) {
@@ -47,6 +49,7 @@ public class Board {
 
         //calculate goal board for later reference
         goal = new int[size * size];
+        //this step takes time proportional to N
         for (int i = 0; i < goal.length - 1; i++) { //add numbers in range [1, size * size - 1]
             goal[i] = i + 1;
         }
@@ -55,6 +58,7 @@ public class Board {
         //transfer data to our internal representation
         boardFlat = new int[size * size];
         int k = 0;
+        //this step takes time proportional to N^2
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
                 boardFlat[k++] = blocks[i][j];
@@ -71,8 +75,6 @@ public class Board {
     /**
      * Board size N (i.e. a 3 by 3 board with 9 total spaces would be size 3)
      * <p>
-     * FIXME add time complexity to javadoc
-     *
      * @return board size N.
      */
     public int size() {
@@ -82,7 +84,7 @@ public class Board {
     /**
      * Hamming priority heuristic; the number of blocks out of place.
      * <p>
-     * FIXME add time complexity to javadoc
+     * Takes time proportional to N^2.
      *
      * @return the number of blocks out of place.
      */
@@ -90,6 +92,7 @@ public class Board {
         int count = 0;
         //we use boardFlat.length - 1 because we are not interested in the position of the blank tile
         for (int i = 0; i < boardFlat.length - 1; i++) {
+            //FIXME this step takes time proportional to N^2, is there a better way? seems unlikely, we must examine each element, yes?
             if (goal[i] != boardFlat[i])
                 count++;
         }
@@ -102,12 +105,15 @@ public class Board {
      * sum of vertical and horizontal distances between
      * blocks and their respective goal positions.
      *
+     * Takes time proportional to N^2.
+     *
      * @return sum of Manhattan distances between blocks and goal.
      */
     public int manhattan() {
         //TODO test this
         int sum = 0;
         for(int i = 0; i < boardFlat.length; i++) {
+            //FIXME this step takes time proportional to N^2, is there a better way? seems unlikely, we must examine each element, yes?
             sum += manhattanSingle(boardFlat[i], i);
         }
 
@@ -117,6 +123,7 @@ public class Board {
     //calculates manhattan distance of a single tile using 1D index
     //Function is:
     //F(x, k) = manhattanSingle(x, i(k), j(k), where i(k) and j(k) return their respective 2D index for 1D index k
+    //This is a constant time operation
     private int manhattanSingle(int x, int k) {
         //Function for going from k = 1D index to (i, j) = 2D indices:
         //F(k) = (k / N, k % N), where N = dimension of board
@@ -126,6 +133,7 @@ public class Board {
     //calculates manhattan distance of a single tile using 2D indices
     //Function is:
     //F(x, i, j) = |goalI - i| + |goalJ - j|, where (i, j) are current indices of x
+    //This is a constant time operation
     private int manhattanSingle(int x, int i, int j) {
         if(x == 0) //we are not interested in position of blank tile
             return 0;
@@ -140,7 +148,7 @@ public class Board {
     /**
      * Is this board the goal board?
      * <p>
-     * FIXME add time complexity to javadoc
+     * Takes time proportional to N^2 in the worst case.
      *
      * @return true if this board is the goal board false otherwise.
      */
@@ -155,6 +163,9 @@ public class Board {
 //        }
 //        goal[goal.length - 1] = 0; //add the blank square in bottom right
 
+        //Should take time proportional to N^2 in the worst case as per java's Arrays.equals spec,
+        //i.e. Arrays.equals takes linear time in the worst case,
+        // i.e. time proportional to M, where M for Arrays.equals = N^2
         return Arrays.equals(boardFlat, goal);
     }
 
@@ -166,7 +177,8 @@ public class Board {
      * and this function is unlikely to be called often.
      * <p>
      * <p>
-     * FIXME add time complexity to javadoc
+     * FIXME remove this comment once we've verified that the below is accurate:
+     * Takes time proportional to N lg(N)
      *
      * @return true if board is solvable false otherwise.
      */
@@ -187,7 +199,8 @@ public class Board {
     /**
      * All boards that can be reached in one legal move from this board
      * <p>
-     * FIXME add time complexity to javadoc
+l    * FIXME remove this comment once we've verified that the below is accurate:
+     * Takes time proportional to N
      *
      * @return all neighboring boards.
      */
@@ -195,7 +208,9 @@ public class Board {
         //FIXME test better, have only tested a couple cases, and only with size = 3 or 4
         //TODO comment better
         var neighbors = new Queue<Board>();
+        //outermost loop runs 3 times, i.e. constant number of times, does not depend on N
         for (int i = blankTileRow - 1; i <= blankTileRow + 1; i++) {
+            //second outer loop runs 3 times, i.e. constant number of times, does not depend on N
             for (int j = blankTileCol - 1; j <= blankTileCol + 1; j++) {
                 //dont go out of bounds
                 boolean inBounds = (i >= 0 && i < size && j >= 0 && j < size);
@@ -204,7 +219,10 @@ public class Board {
                 // I wonder if this is too many conditions and it would be better to allow the wasted blank tile moving
                 // to itself case
                 if (inBounds && (i == blankTileRow || j == blankTileCol) && !(i == blankTileRow && j == blankTileCol)) {
+                    //FIXME assuming that allocating a new array is constant and does not depend
+                    // on it's size, is this true?
                     int[][] newBoardState = new int[size][size];
+                    //this step takes time proportional to N
                     for (int k = 0; k < size; k++) {
                         newBoardState[k] = Arrays.copyOfRange(boardFlat, (k * size), (k * size) + size);
                     }
@@ -218,15 +236,17 @@ public class Board {
             }
         }
 
+        //Total time is apprx 9N, or O(N)
         return neighbors;
     }
 
+    //Should take time proportional to N^2
     @Override
     public String toString() {
         var sb = new StringBuilder();
         sb.append(size).append("\n");
-        for (int i = 0; i < size; i++) {
-            for (int j = 0; j < size; j++) {
+        for (int i = 0; i < size; i++) { //outer loop runs N times
+            for (int j = 0; j < size; j++) { //inner loop runs N times
                 sb.append(String.format("%2d ", boardFlat[(i * size) + j]));
             }
             sb.append("\n");
@@ -234,6 +254,10 @@ public class Board {
         return sb.toString();
     }
 
+
+    //Should take time proportional to N^2 in the worst case as per java's Arrays.equals spec,
+    //i.e. Arrays.equals takes linear time in the worst case,
+    // i.e. time proportional to M, where M for Arrays.equals = N^2
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -242,15 +266,24 @@ public class Board {
         return Arrays.equals(boardFlat, board.boardFlat);
     }
 
+    //Should take time proportional to N^2 in the worst case as per java's Arrays.hashcode spec,
+    //i.e. Arrays.hashcode takes linear time in the worst case,
+    // i.e. time proportional to M, where M for Arrays.hashcode = N^2
     @Override
     public int hashCode() {
         return Arrays.hashCode(boardFlat);
     }
 
+    //FIXME unclear on time complexity here. Merge sort is N lg N, but what isn't mergesort considering
+    // M lg M where M = N^2, just like some of the above cases? Does this break the requirements?
+    // (N^2) lg (N^2) > N^2...
     private static int inversions(int[] data) {
         return mergeSort(data, 0, data.length - 1);
     }
 
+    //FIXME unclear on time complexity here. Merge sort is N lg N, but what isn't mergesort considering
+    // M lg M where M = N^2, just like some of the above cases? Does this break the requirements?
+    // (N^2) lg (N^2) > N^2...
     private static int mergeSort(int[] data, int lo, int hi) {
         int mid = lo + (hi - lo) / 2;
         int inversions = 0;
@@ -270,6 +303,9 @@ public class Board {
     }
 
 
+    //FIXME unclear on time complexity here. Merge sort is N lg N, but what isn't mergesort considering
+    // M lg M where M = N^2, just like some of the above cases? Does this break the requirements?
+    // (N^2) lg (N^2) > N^2...
     private static int merge(int[] data, int lo, int mid, int hi) {
         //precondition
 //        assert isSorted(data, 0, mid);
@@ -319,6 +355,7 @@ public class Board {
      *  F(x) = [(x-1)/N, (x -1)%N], where N = dimensions of this board & '/' indicates integer division
      *  Domain: x | x is in range: [1, (N^2) - 1]
      *  Range: (i, j) -> ([0, N-1], [0, N-1])
+     *  This is a constant time operation
      */
     private int[] goalIndices(int x) {
         //disallow inputs outside of our domain
