@@ -10,11 +10,14 @@ import edu.princeton.cs.algs4.Queue;
  * //FIXME remove fixme comment once we can verify the below is accurate, and perhaps get more detailed
  * //FIXME  if many methods end up with better than N^2 performance:
  * All methods take time proportional to N^2 or better, where N is the length of one side of the board.
+ * Or: time proportional to M where M is total number of elements, i.e. N^2
  * @author Alec Mills
  * @author Chau Pham
  */
 public class Board {
-    /*PERFORMANCE REQS:
+    /*FIXME delete this when we can be confident we have met these requirements
+     * and have notated such for each method
+     * PERFORMANCE REQS:
      * all methods take time proportional to N^2 or better,
      * with the exception of isSolvable() which may take up to N^4 in the worst case
      */
@@ -39,7 +42,8 @@ public class Board {
      * (where blocks[i][j] = block in row i, column j).
      * Valid integers are between 0 and (N^2) - 1, where zero represents the empty space
      * <p>
-     * Takes time proportional to N^2.
+     * Takes time proportional to N^2 where N = side-length of board,
+     * i.e. time proportional to M where M = total number of elements.
      * @param blocks initial layout of blocks.
      */
     public Board(int[][] blocks) {
@@ -84,7 +88,8 @@ public class Board {
     /**
      * Hamming priority heuristic; the number of blocks out of place.
      * <p>
-     * Takes time proportional to N^2.
+     * Takes time proportional to N^2 where N = side-length of board,
+     * i.e. time proportional to M where M = total number of elements.
      *
      * @return the number of blocks out of place.
      */
@@ -105,7 +110,8 @@ public class Board {
      * sum of vertical and horizontal distances between
      * blocks and their respective goal positions.
      *
-     * Takes time proportional to N^2.
+     * Takes time proportional to N^2 where N = side-length of board,
+     * i.e. time proportional to M where M = total number of elements.
      *
      * @return sum of Manhattan distances between blocks and goal.
      */
@@ -133,6 +139,7 @@ public class Board {
     //calculates manhattan distance of a single tile using 2D indices
     //Function is:
     //F(x, i, j) = |goalI - i| + |goalJ - j|, where (i, j) are current indices of x
+    //
     //This is a constant time operation
     private int manhattanSingle(int x, int i, int j) {
         if(x == 0) //we are not interested in position of blank tile
@@ -148,7 +155,9 @@ public class Board {
     /**
      * Is this board the goal board?
      * <p>
-     * Takes time proportional to N^2 in the worst case.
+     * Takes time proportional to N^2 where N = side-length of board,
+     * i.e. time proportional to M where M = total number of elements,
+     * in the worst case.
      *
      * @return true if this board is the goal board false otherwise.
      */
@@ -178,7 +187,8 @@ public class Board {
      * <p>
      * <p>
      * FIXME remove this comment once we've verified that the below is accurate:
-     * Takes time proportional to N lg(N)
+     * Takes time proportional to M lg(M) where M is the total number of elements,
+     * i.e. N^2
      *
      * @return true if board is solvable false otherwise.
      */
@@ -274,16 +284,20 @@ l    * FIXME remove this comment once we've verified that the below is accurate:
         return Arrays.hashCode(boardFlat);
     }
 
-    //FIXME unclear on time complexity here. Merge sort is N lg N, but what isn't mergesort considering
-    // M lg M where M = N^2, just like some of the above cases? Does this break the requirements?
-    // (N^2) lg (N^2) > N^2...
+    //FIXME current implementation is O(M log M) where M = N^2 i.e. size^2,
+    //a solution exists that is O(M) but I have not come up with it yet.
+    //Thought:
+    //check parity of Manhatttan distance for each tile, consider parity of inversioons
+    //to be equal to parity of product of manhattan distance parities?
     private static int inversions(int[] data) {
         return mergeSort(data, 0, data.length - 1);
     }
 
-    //FIXME unclear on time complexity here. Merge sort is N lg N, but what isn't mergesort considering
-    // M lg M where M = N^2, just like some of the above cases? Does this break the requirements?
-    // (N^2) lg (N^2) > N^2...
+    //FIXME current implementation is O(M log M) where M = N^2 i.e. size^2,
+    //a solution exists that is O(M) but I have not come up with it yet.
+    //Thought:
+    //check parity of Manhatttan distance for each tile, consider parity of inversioons
+    //to be equal to parity of product of manhattan distance parities?
     private static int mergeSort(int[] data, int lo, int hi) {
         int mid = lo + (hi - lo) / 2;
         int inversions = 0;
@@ -303,9 +317,11 @@ l    * FIXME remove this comment once we've verified that the below is accurate:
     }
 
 
-    //FIXME unclear on time complexity here. Merge sort is N lg N, but what isn't mergesort considering
-    // M lg M where M = N^2, just like some of the above cases? Does this break the requirements?
-    // (N^2) lg (N^2) > N^2...
+    //FIXME current implementation is O(M log M) where M = N^2 i.e. size^2,
+    //a solution exists that is O(M) but I have not come up with it yet.
+    //Thought:
+    //check parity of Manhatttan distance for each tile, consider parity of inversioons
+    //to be equal to parity of product of manhattan distance parities?
     private static int merge(int[] data, int lo, int mid, int hi) {
         //precondition
 //        assert isSorted(data, 0, mid);
