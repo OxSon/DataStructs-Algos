@@ -1,8 +1,6 @@
 package eightPuzzle;
 
-import edu.princeton.cs.algs4.In;
-import edu.princeton.cs.algs4.MinPQ;
-import edu.princeton.cs.algs4.StdOut;
+import edu.princeton.cs.algs4.*;
 
 /**
  * Solves a given 8-Puzzle board, if solvable.
@@ -11,12 +9,12 @@ import edu.princeton.cs.algs4.StdOut;
  * @author Chau Pham
  */
 public class Solver {
-    private MinPQ<Board> pq;
+    private MinPQ<Board> pq = new MinPQ<>();
     //MinPQ<SearchNode> pq;
 
     //no reason not to store these that I can see
     private int moves;
-    private Iterable<Board> solution;
+    private Stack<Board> solution;
 
     /**
      * Finds a solution to the initial board given (using the A* algorithm).
@@ -30,6 +28,28 @@ public class Solver {
         if (!initial.isSolvable())
             throw new IllegalArgumentException("Board is not solvable");
         //TODO
+        solution = solve(initial);
+        moves = solution.size();
+    }
+
+    //use a stack so it gets returned starting from beginning board state
+    private Stack<Board> solve(Board initial) {
+        //FIXME this is broken, we need search node class. board doesn't store previous.
+        //TODO test, this is just based on my last time doing this same project (actually different but similar)
+        Board head = initial;
+        do {
+            for (var neighbor : initial.neighbors()) {
+                if (!neighbor.equals(head))
+                    pq.insert(neighbor);
+            }
+            head = pq.delMin();
+        } while (head.isGoal());
+
+        //can't return chain of previous right now.
+        //do we want to make searchnode class that stores reference to previous,
+        //or do we want to imitate my previous solution, i.e. make a private enum that tracks moves and
+        //reconstruct board from that? will memory savings be worth the confusion?
+        return null;
     }
 
     /**
