@@ -6,11 +6,12 @@ import edu.princeton.cs.algs4.Queue;
 
 /**
  * Represents an 8-Puzzle board.
- *
+ * <p>
  * //FIXME remove fixme comment once we can verify the below is accurate, and perhaps get more detailed
  * //FIXME  if many methods end up with better than N^2 performance:
  * All methods take time proportional to N^2 or better, where N is the length of one side of the board.
  * Or: time proportional to M where M is total number of elements, i.e. N^2
+ *
  * @author Alec Mills
  * @author Chau Pham
  */
@@ -44,6 +45,7 @@ public class Board {
      * <p>
      * Takes time proportional to N^2 where N = side-length of board,
      * i.e. time proportional to M where M = total number of elements.
+     *
      * @param blocks initial layout of blocks.
      */
     public Board(int[][] blocks) {
@@ -79,6 +81,7 @@ public class Board {
     /**
      * Board size N (i.e. a 3 by 3 board with 9 total spaces would be size 3)
      * <p>
+     *
      * @return board size N.
      */
     public int size() {
@@ -109,7 +112,7 @@ public class Board {
      * Manhattan priority heuristic;
      * sum of vertical and horizontal distances between
      * blocks and their respective goal positions.
-     *
+     * <p>
      * Takes time proportional to N^2 where N = side-length of board,
      * i.e. time proportional to M where M = total number of elements.
      *
@@ -118,7 +121,7 @@ public class Board {
     public int manhattan() {
         //TODO test this
         int sum = 0;
-        for(int i = 0; i < boardFlat.length; i++) {
+        for (int i = 0; i < boardFlat.length; i++) {
             //FIXME this step takes time proportional to N^2, is there a better way? seems unlikely, we must examine each element, yes?
             sum += manhattanSingle(boardFlat[i], i);
         }
@@ -142,7 +145,7 @@ public class Board {
     //
     //This is a constant time operation
     private int manhattanSingle(int x, int i, int j) {
-        if(x == 0) //we are not interested in position of blank tile
+        if (x == 0) //we are not interested in position of blank tile
             return 0;
         //int[] goal = [goalI, goalJ]
         int[] goal = goalIndices(x);
@@ -179,21 +182,125 @@ public class Board {
     }
 
     /**
-     * Is this board solvable? Uses an enhanced merge sort method to determine this by counting inversions.
+     * Is this board solvable?
      * <p>
-     * Provides solution in O(n lg(n)) time complexity. The authors felt the additional memory required by
-     * Merge-sort was a worthy trade-off, considering that this extra memory is ephemeral to the function itself
-     * and this function is unlikely to be called often.
-     * <p>
+     * Whether a board is solvable depends on two-to-three variables: the length of it's side-- N,
+     * the number of inversions in the permutation, or more precisely, their parity,
+     * and, if N is even, also the row-index of the blank tile, or again, its' parity.
      * <p>
      * FIXME remove this comment once we've verified that the below is accurate:
-     * Takes time proportional to M lg(M) where M is the total number of elements,
-     * i.e. N^2
+     * Using this method, we are able to determine parity in
+     * time proportional to M where M is the total number of elements, i.e. N^2
      *
      * @return true if board is solvable false otherwise.
      */
     public boolean isSolvable() {
-        //FIXME only very briefly tested
+        //FIXME: tested with a a small number of known inputs and with random input,
+        // final test that would be useful would be comparing against the entire file-list
+        // that is provided by the course instructors, i.e. against a large number of known inputs.
+        // setting up the test might be a pain in the ass though
+        boolean evenParity = permutationParity();
+        //odd board size, like classic 8 puzzle which is 3x3
+        if (size % 2 != 0) {
+            return evenParity; //in this case we need our parity to be even
+        } else {
+            //in the case of an even board size, we need parity to be odd.
+            //the parity of a sum of numbers can only be odd in an
+            //exclusive or situation, i.e.:
+            //even + even = even, odd + odd = even
+            //odd + even = odd
+            boolean zeroParity = blankTileRow % 2 == 0;
+            return zeroParity != evenParity;
+        }
+    }
+
+    private boolean permutationParity() {
+        //choosing to copy the data into an aux array because it allows easy
+        //marking of 'visited' elements, allows us to get rid of the zero in the beginning
+        //instead of needing to do some clever calculation to figure out relative indices,
+        //and conforms to expectation that board data type is immutable.
+        //Another option would be to create an auxiliary bool array of length M,
+        //mark zero as visited initially, and then do clever math on our indices
+        //to translate to relative positions. This sounds more difficult to me, and
+        //does not rid of us of the need to create another array. It does save time
+        //as it gets rid of one N term for full eq of time complexity
+        int[] p = new int[boardFlat.length - 1];
+        int M = p.length;
+        int i = 0;//where we are in our copied array
+        int j = 0;//where we are in our original array
+        //time complexity: O(M), where M = N^2 - 1, where N = side-length of board, i.e. floor(sqrt(num elements))
+        while (i < M) {
+            int num = boardFlat[j];
+            if (num != 0) { //don't consider zero as an element
+                p[i] = num;
+                i++; //only move to next slot in our new array if we've added an element
+            }
+            j++; //move to next space in our old array
+        }
+
+        //reuse the same i variable for a new purpose
+        i = 0;
+        int init = p[0]; //beginning of our current cycle
+        int oddCycles = 0;
+        int processed = 0; //number of elements we have processed
+        int current = init; //current element we are processing
+        int cycleSum = 1; //number of elements in our current cycle so far, starts at one to include init
+
+        //if we've processed all but one element, we know the last element is fixed and thus
+        //there are no more odd-cycles to find
+        while (processed < M - 1) {
+
+            //First, from our element, look to it's goal index and note that value
+            // (note we add M to an element to mark it as visited, since no unvisited element will be > M)
+            if (current <= M) {//if it's not visited
+                int next = p[current - 1];
+                p[current - 1] += M; //mark it as visited
+                //If we haven't completed a cycle
+                if (next != init) {
+                    current = next; //move to process next element
+                    cycleSum++; //note an additional element in our cycle
+                } else {
+                    //move to next element if there is one
+                    init = p[++i];
+                    current = init;
+                    processed += cycleSum; //note how many elements were processed in this cycle
+                    //An 'odd' cycle is defined as one with an odd number of transpositions,
+                    //i.e. an even number of elements involved in the cycle
+                    //e.g. a single transposition like: (13) is odd, a cycle consisting of
+                    //two transpositions is even, like: (134)
+                    oddCycles += (cycleSum % 2 == 0) ? 1 : 0;
+                    cycleSum = 1; //reset cyclesum to 1 at the beginning of each new cycle
+                }
+            } else { //otherwise move to next element if there is one
+                //additionally, this can only happen in between cycles, and thus cycleSum will never be even,
+                //and thus oddCycles will never need to be iterated in this branch.
+                init = p[++i];
+                current = init;
+            }
+        }
+
+        //total parity is the parity of the sum of each individual cycle's parity
+        //put more simply, it is the product of each individual cycle's parity
+        return oddCycles % 2 == 0;//index of next element to process (if not yet visited) in P, our permutation.
+    }
+
+    //FIXME this is the merge sort version, O(M lg (M)) where M is total num elements i.e. N^2 where N is side-length
+//    /**
+//     * Is this board solvable? Uses an enhanced merge sort method to determine this by counting inversions.
+//     * <p>
+//     * Provides solution in O(n lg(n)) time complexity. The authors felt the additional memory required by
+//     * Merge-sort was a worthy trade-off, considering that this extra memory is ephemeral to the function itself
+//     * and this function is unlikely to be called often.
+//     * <p>
+//     * <p>
+//     * FIXME remove this comment once we've verified that the below is accurate:
+//     * Takes time proportional to M lg(M) where M is the total number of elements,
+//     * i.e. N^2
+//     *
+//     * @return true if board is solvable false otherwise.
+//     */
+    //FIXME delete this and the merge sort methods, breaks API, useful for testing though
+    public boolean isSolvableMergeSortMethod() {
         int inversions = inversions(boardFlat);
 
         // 1 2 3 4 5 0 6 8 9 10 7 11 13 14 15 12
@@ -209,7 +316,7 @@ public class Board {
     /**
      * All boards that can be reached in one legal move from this board
      * <p>
-l    * FIXME remove this comment once we've verified that the below is accurate:
+     * l    * FIXME remove this comment once we've verified that the below is accurate:
      * Takes time proportional to N
      *
      * @return all neighboring boards.
@@ -378,7 +485,7 @@ l    * FIXME remove this comment once we've verified that the below is accurate:
         if (x < 1 || x > (size * size) - 1)
             throw new IllegalArgumentException("Input to goal indices is invalid");
         //Recall our function is: F(x) = [(x-1)/N, (x -1)%N]
-        return new int[] {(x - 1) / size, (x - 1) % size };
+        return new int[]{(x - 1) / size, (x - 1) % size};
     }
 
     //FIXME not working
