@@ -13,7 +13,6 @@ public class Solver {
     //MinPQ<SearchNode> pq;
 
     //no reason not to store these that I can see
-    private int moves;
     private Stack<Board> solution;
 
     /**
@@ -29,13 +28,14 @@ public class Solver {
             throw new IllegalArgumentException("Board is not solvable");
         //TODO
         solution = solve(initial);
-        moves = solution.size();
     }
 
     //use a stack so it gets returned starting from beginning board state
     private Stack<Board> solve(Board initial) {
         //FIXME this is broken, we need search node class. board doesn't store previous.
-        //TODO test, this is just based on my last time doing this same project (actually different but similar)
+        // options are described below. In general, what we should do is:
+        // chain from end goal board back to beginning using the 'previous' field, or by reconstructing with move enum,
+        // and add them to a stack as we go, and then add all those boards to the solution queue (thereby correcting the order)
         Board head = initial;
         do {
             for (var neighbor : initial.neighbors()) {
@@ -57,8 +57,7 @@ public class Solver {
      * @return the minimum number of moves.
      */
     public int moves() {
-        //TODO
-        return 0;
+        return solution.size();
     }
 
     /**
@@ -66,8 +65,7 @@ public class Solver {
      * @return a sequence of boards in a shortest solution.
      */
     public Iterable<Board> solution() {
-        //TODO
-        return null;
+        return solution;
     }
 
     /**
