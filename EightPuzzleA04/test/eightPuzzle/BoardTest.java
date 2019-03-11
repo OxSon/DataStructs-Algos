@@ -1,6 +1,8 @@
 package eightPuzzle;
 
+import algs4.dequerandqueue.RandomizedQueue;
 import edu.princeton.cs.algs4.Queue;
+import edu.princeton.cs.algs4.StdRandom;
 import org.junit.jupiter.api.Test;
 
 import java.util.function.Supplier;
@@ -58,7 +60,21 @@ class BoardTest {
 
     @Test
     void isSolvableTest() {
-        var board = new Board(new int[][]{
+        var board = new Board(new int[][] {
+                {1,2,3},
+                {4,5,6},
+                {7,8,0}
+        });
+        assertTrue(board.isSolvable());
+        board = new Board(new int[][] {
+                {8,6,7},
+                {2,5,4},
+                {3,1,0}
+        });
+        assertTrue(board.isSolvable());
+
+        //FIXME why does these next two data sets take so much time?
+        board = new Board(new int[][]{
                 {1, 2, 3, 4},
                 {5, 0, 6, 8},
                 {9, 10, 7, 11},
@@ -95,6 +111,33 @@ class BoardTest {
                 {13, 15, 14, 0},
         });
         assertFalse(board.isSolvable());
+    }
+
+    @Test
+    void isSolvableRandomInputTest() {
+        for(int i = 0; i < 100; i++) {
+            //random dimension board
+            int dimensions = StdRandom.uniform(100) + 2; //only do 2x2 or greater
+            int range = dimensions * dimensions;
+            int[][] tiles = new int[dimensions][dimensions];
+            //use randomized queue so that board gets filled in random order
+            var q = new RandomizedQueue<Integer>();
+            for(int j = 0; j < range; j++) {
+                q.enqueue(j);
+            }
+            //fill up tiles
+            for(int j = 0; j < dimensions; j++) {
+                for(int k = 0; k < dimensions; k++) {
+                    tiles[j][k] = q.dequeue();
+                }
+            }
+
+            var board = new Board(tiles);
+
+            boolean linearMethod = board.isSolvable();
+            boolean linearithmicMethod = board.isSolvableMergeSortMethod();
+            assertEquals(linearithmicMethod, linearMethod);
+        }
     }
 
     @Test
